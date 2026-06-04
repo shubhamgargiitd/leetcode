@@ -1,49 +1,40 @@
-class Solution {
+class DSU {
 private:
-    void dfs(int src, const vector<vector<int>>& stones, vector<bool>& visited,
-             const unordered_map<int, vector<int>>& rowMap, 
-             const unordered_map<int, vector<int>>& colMap) {
-        
-        visited[src] = true;
-        int r = stones[src][0];
-        int c = stones[src][1];
-        
-        // Traverse all stones in the same row
-        for (int neighbor : rowMap.at(r)) {
-            if (!visited[neighbor]) {
-                dfs(neighbor, stones, visited, rowMap, colMap);
-            }
-        }
-        
-        // Traverse all stones in the same column
-        for (int neighbor : colMap.at(c)) {
-            if (!visited[neighbor]) {
-                dfs(neighbor, stones, visited, rowMap, colMap);
-            }
-        }
-    }
+    unordered_map<int, int> parent;
 
 public:
+    int components = 0;
+
+    int find(int i) {
+        // If 'i' is not in the map, it's a new element/component
+        if (parent.find(i) == parent.end()) {
+            parent[i] = i;
+            components++;
+        }
+        if (parent[i] == i) return i;
+        return parent[i] = find(parent[i]); // Path compression
+    }
+
+    void unionNodes(int i, int j) {
+        int rootI = find(i);
+        int rootJ = find(j);
+        if (rootI != rootJ) {
+            parent[rootI] = rootJ;
+            components--; // Two components merged into one
+        }
+    }
+};
+
+class Solution {
+public:
     int removeStones(vector<vector<int>>& stones) {
-        int n = stones.size();
-        unordered_map<int, vector<int>> rowMap, colMap;
+        DSU dsu;
         
-        // Group stone indices by their row and column coordinates
-        for (int i = 0; i < n; ++i) {
-            rowMap[stones[i][0]].push_back(i);
-            colMap[stones[i][1]].push_back(i);
+        for (const auto& stone : stones) {
+            // ~stone[1] distinguishes column indices from row indices
+            dsu.unionNodes(stone[0], ~stone[1]);
         }
         
-        vector<bool> visited(n, false);
-        int numComponents = 0;
-        
-        for (int i = 0; i < n; ++i) {
-            if (!visited[i]) {
-                dfs(i, stones, visited, rowMap, colMap);
-                numComponents++; // Found a new connected component
-            }
-        }
-        
-        return n - numComponents;
+        return stones.size() - dsu.components;
     }
 };
