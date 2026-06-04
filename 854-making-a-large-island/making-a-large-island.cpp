@@ -1,10 +1,3 @@
-#include <vector>
-#include <unordered_set>
-#include <numeric>
-#include <algorithm>
-
-using namespace std;
-
 class Solution {
 private:
     int n;
