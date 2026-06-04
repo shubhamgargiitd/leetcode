@@ -6,22 +6,32 @@ using namespace std;
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-        // Max-heap storing pairs of {value, index}
-        priority_queue<pair<int, int>> max_heap;
+        priority_queue<int> live_heap;
+        priority_queue<int> delete_heap;
         vector<int> result;
 
-        for (int i = 0; i < nums.size(); ++i) {
-            max_heap.push({nums[i], i});
+        // 1. Fill the first window
+        for (int i = 0; i < k; ++i) {
+            live_heap.push(nums[i]);
+        }
+        result.push_back(live_heap.top());
 
-            // Lazy deletion: remove elements from top if they are outside the window
-            while (max_heap.top().second <= i - k) {
-                max_heap.pop();
+        // 2. Slide the window across the rest of the array
+        for (int i = k; i < nums.size(); ++i) {
+            // Push the new incoming element
+            live_heap.push(nums[i]);
+            
+            // The leftmost element exits the window; track it for deletion
+            delete_heap.push(nums[i - k]);
+
+            // Lazy deletion loop: if the current maximums match, cancel them out
+            while (!delete_heap.empty() && !live_heap.empty() && live_heap.top() == delete_heap.top()) {
+                live_heap.pop();
+                delete_heap.pop();
             }
 
-            // Start adding to results once the first window is fully formed
-            if (i >= k - 1) {
-                result.push_back(max_heap.top().first);
-            }
+            // The top of the live heap is our maximum for the current window
+            result.push_back(live_heap.top());
         }
 
         return result;
