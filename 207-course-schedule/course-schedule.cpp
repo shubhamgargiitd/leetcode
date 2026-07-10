@@ -1,33 +1,45 @@
 class Solution {
 public:
-    bool dfs(int node, vector<vector<int>> &adjlist, vector<int> &state){
 
-        if(state[node ] == 1) return true; 
-        if(state[node ] == 2) return false; 
-
-        state[node ] = 1; 
-
-        for(auto nei : adjlist[node]){
-            if(dfs(nei, adjlist, state)){
-                return true; 
-            }
-        }
-        state[node] = 2; 
-        return false; 
-    }
 
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
         vector<vector<int>> adjlist(numCourses); 
         vector<int> state (numCourses, 0);
+        vector<int> indegree(numCourses);
         for(auto e : prerequisites){
-            adjlist[e[1]].push_back(e[0]);
+            adjlist[e[0]].push_back(e[1]);
+            indegree[e[1]]++;
+
+
+
         }
 
-        for(int i = 0; i < numCourses; ++i){
-            if(dfs(i, adjlist, state)){
-                return false;
+        queue<int> q; 
+        int coursesdone = 0; 
+        for(int i = 0; i < numCourses ; ++i){
+            if(indegree[i] == 0){
+                q.push(i);
+                coursesdone++;
+
             }
         }
-        return true; 
+
+
+        while(!q.empty()){
+            int j = q.front(); q.pop();
+
+            for(int nei : adjlist[j]){
+                indegree[nei]--;
+                if(indegree[nei] == 0){
+                    q.push(nei);
+                    coursesdone++;
+                }
+            }
+
+        
+        
+        
+        }
+        return numCourses == coursesdone;
     }
 };
