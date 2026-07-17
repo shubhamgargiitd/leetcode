@@ -1,16 +1,23 @@
 class Solution {
 public:
+    int solve(vector<int>& nums, int idx, vector<int>& dp) {
+        if (idx < 0)
+            return 0;
+
+        if (idx == 0)
+            return nums[0];
+
+        if (dp[idx] != -1)
+            return dp[idx];
+
+        int take = nums[idx] + solve(nums, idx - 2, dp);
+        int skip = solve(nums, idx - 1, dp);
+
+        return dp[idx] = max(take, skip);
+    }
+
     int rob(vector<int>& nums) {
-
-        int prev2 = 0;
-        int prev1 = 0;
-
-        for (int money : nums) {
-            int curr = max(prev1, prev2 + money);
-            prev2 = prev1;
-            prev1 = curr;
-        }
-
-        return prev1;
+        vector<int> dp(nums.size(), -1);
+        return solve(nums, nums.size() - 1, dp);
     }
 };
