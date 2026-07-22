@@ -5,7 +5,6 @@ public:
         vector<vector<bool>> dp(n + 1, vector<bool>(m + 1, false));
         dp[0][0] = true;
 
-        // Helper lambda to check if s[i-1] matches p[j-1]
         auto matches = [&](int i, int j) {
             return i > 0 && (p[j - 1] == '.' || p[j - 1] == s[i - 1]);
         };
